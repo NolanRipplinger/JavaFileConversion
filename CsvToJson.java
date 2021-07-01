@@ -32,7 +32,7 @@ public class CsvToJson
 			
 			//While file is not finished
 			while(fileReader.hasNextLine()) {
-				records.add(getRecordFromLine(fileReader.nextLine()));
+				records.add(getCSVRecordFromLine(fileReader.nextLine()));
 				
 			}
 			//Close input file reader, CSV parsed
@@ -52,35 +52,41 @@ public class CsvToJson
 			//Create new file, wipe if already existing
 			outputJson.createNewFile();
 			
-			
+			//Get input files
 			output = new FileWriter(outputJson.getAbsoluteFile());
 			bufferedOutput = new BufferedWriter(output);
 			
-			bufferedOutput.write("[");
+			//
+			
+			
+			bufferedOutput.write("[\n");
+			
 			//Iterate through all
 			for(int i = 0; i < records.size() - 1; i++) 
 			{
-				bufferedOutput.write("{");
+				bufferedOutput.write("  {\n");
 				
 				for(int j = 0; j < records.get(i).size(); j++) 
 				{
+					
+					bufferedOutput.write("\t");
 					
 					//Grab the column header for this element
 					bufferedOutput.write("\"" + records.get(0).get(j) + "\":");
 					
 					//Add the corresponding element
-					bufferedOutput.write("\"" + records.get(i + 1).get(j) + "\"");
+					bufferedOutput.write(" \"" + records.get(i + 1).get(j) + "\"");
 					
 					//Don't put a comma at the end of each final element
 					if(j != records.get(i).size() - 1) 
 					{
-						bufferedOutput.write(",");
+						bufferedOutput.write(",\n");
 					}
 					
 				}
 				
 				//Format for end of entry
-				bufferedOutput.write("}");
+				bufferedOutput.write("\n  }");
 				
 				//If last entry in file then don't append comma and newline
 				if(i != records.size() - 2) 
@@ -91,7 +97,7 @@ public class CsvToJson
 			}
 			
 			//End of file to close off JSON elements
-			bufferedOutput.write("]");
+			bufferedOutput.write("\n]");
 			
 			//Close off the file inputs
 			bufferedOutput.close();
@@ -110,7 +116,10 @@ public class CsvToJson
 		
 	}
 	
-	private static List<String> getRecordFromLine(String line)
+	/*	Takes a string input (from a CSV) and returns a list of strings
+		which contain the fields of the CSV
+	*/
+	private static List<String> getCSVRecordFromLine(String line)
 	{
 		//Create new List<String> to return
 		List<String> values = new ArrayList<String>();

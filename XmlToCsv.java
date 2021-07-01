@@ -13,7 +13,7 @@ import java.util.List;
 public class XmlToCsv 
 {
 	
-	final static String DELIMITER = "</row>";
+	final static String DELIMITER = ",";
 
 	public static void main(String[] args) 
 	{
@@ -27,24 +27,84 @@ public class XmlToCsv
 		
 		//Wrap input IO File in try/catch to avoid incorrect file name error
 		//This is parsing a CSV input file
-		try {
+		try 
+		{
 			fileReader = new Scanner(inputXml);
 			
+			int numOfColumns = 0;
+			int numOfRows = 0;
+			int numOfRecords = 0;
+			boolean columnsAdded = false;
+			boolean columnsParsed = false;
+			List<String> values = new ArrayList<String>();
+			List<String> headers = new ArrayList<String>();
+			
 			//While file is not finished
-			while(fileReader.hasNextLine()) {
+			while(fileReader.hasNextLine()) 
+			{
+				
+				//Convert nextline to string for formatting
 				String inputLine = fileReader.nextLine();
 				
-				//Only focus on lines that contain elements
-				if(inputLine.contains("")) {
-					inputLine = inputLine.trim();
-					records.add(getXMLRecordFromLine(inputLine));
+				//Format input
+				inputLine = inputLine.trim();
+				
+				//No need to populate columns names after first row
+				if (!columnsParsed && inputLine.contains("</row>"))
+				{
+					numOfRecords++;
+					columnsParsed = true;
 				}
 				
+				if (!columnsParsed) {
+					//numOfColumns++;
+				} else {
+					if(!columnsAdded) {
+						records.add(headers);
+						columnsAdded = true;
+					}
+					if ((numOfRows % numOfColumns) == 0) 
+					{
+						List<String> valuesCopy = new ArrayList<String>(values);
+						records.add(valuesCopy);
+						values.clear();
+					}
+					
+				}
+				
+				//Make sure root, and row properties are not present. Only contents
+				if (!inputLine.contains("root>") && !inputLine.contains("row>")) 
+				{
+					
+					//This code strips the string into element contents
+					String contents = inputLine.substring(inputLine.indexOf(">") + 1);
+					contents = contents.substring(0, contents.indexOf("<"));
+					values.add(contents);
+					//System.out.println(values);
+					
+					if(!columnsParsed) {
+						String header = inputLine.substring(inputLine.indexOf("<") + 1);
+						header = header.substring(0, header.indexOf(">"));
+						headers.add(header);
+					}				
+					numOfRows++;
+					if (!columnsParsed) {
+						numOfColumns++;
+					} else {
+						if (numOfRows % numOfColumns == 0) 
+						{
+							numOfRecords++;
+						}
+					}
+				}
+				System.out.println(values);
 			}
+
 			//Close input file reader, XML parsed
 			fileReader.close();
 			
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e) 
+		{
 			//Naming error occurred, make sure to exit
 			System.out.println("Input file not found, exiting");
 			System.exit(1);
@@ -103,38 +163,4 @@ public class XmlToCsv
 		System.out.println("num of columns in row 1: " + records.get(1).size());
 		
 	}
-	
-	/*	Takes a string input (from a JSON) and returns a list of strings
-		which contain the fields of the JSON
-	 */
-	private static List<String> getXMLRecordFromLine(String line)
-	{
-		int numOfColumns = 0;
-		boolean rowsComplete = false;
-		
-		//Create new List<String> to return
-		List<String> values = new ArrayList<String>();
-		
-		//Creating new scanner to scan line (requires not found exception catching)
-		try (Scanner rowScanner = new Scanner(line))
-		{
-			
-			//Only need this if delimiter is not comma
-			rowScanner.useDelimiter(Pattern.compile(DELIMITER));
-			
-			//Take input character by character
-			while(rowScanner.hasNext()) 
-			{
-				//Save current line as string to manipulate
-				String currentLine = rowScanner.next();
-				System.out.println(currentLine);
-				values.add(currentLine);
-				
-			}
-		}
-		
-		//Return list of newly separated fields
-		return values;
-	}
-
 }

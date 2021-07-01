@@ -78,7 +78,18 @@ public class JsonToCsv
 					
 					//This code strips the string into element contents
 					String contents = inputLine.substring(inputLine.indexOf(":") + 1);
-					//contents = contents.substring(0, contents.indexOf("\""));
+					
+					//Remove any whitespace after removing header information
+					contents = contents.trim();
+					
+					//If element contains a string, remove quotations and comma
+					if(contents.contains("\"")) {
+						contents = contents.substring(inputLine.indexOf("\"") + 1);
+						contents = contents.substring(0, contents.indexOf("\""));
+					} else if (contents.contains(",")) {//Remove comma if no quotations exist
+						contents = contents.substring(0, contents.indexOf(","));
+					}
+					System.out.println(contents);
 					values.add(contents);
 					
 					if(!columnsParsed) {
@@ -155,6 +166,8 @@ public class JsonToCsv
 		
 		
 		//output fun
+		System.out.println(records.size());
+		System.out.println(records.get(0).size());
 		
 	}
 }

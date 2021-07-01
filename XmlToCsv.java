@@ -63,7 +63,7 @@ public class XmlToCsv
 						records.add(headers);
 						columnsAdded = true;
 					}
-					if ((numOfRows % numOfColumns) == 0) 
+					if (numOfRows % numOfColumns == 0 && values.size() != 0) 
 					{
 						List<String> valuesCopy = new ArrayList<String>(values);
 						records.add(valuesCopy);
@@ -80,7 +80,6 @@ public class XmlToCsv
 					String contents = inputLine.substring(inputLine.indexOf(">") + 1);
 					contents = contents.substring(0, contents.indexOf("<"));
 					values.add(contents);
-					//System.out.println(values);
 					
 					if(!columnsParsed) {
 						String header = inputLine.substring(inputLine.indexOf("<") + 1);
@@ -97,7 +96,6 @@ public class XmlToCsv
 						}
 					}
 				}
-				System.out.println(values);
 			}
 
 			//Close input file reader, XML parsed
@@ -157,10 +155,6 @@ public class XmlToCsv
 		
 		
 		//output fun
-		//System.out.println(records);
-		System.out.println("Num of records: " + records.size());
-		System.out.println("Num of columns: " + records.get(0).size());
-		System.out.println("num of columns in row 1: " + records.get(1).size());
 		
 	}
 }

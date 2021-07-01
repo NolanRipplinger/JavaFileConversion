@@ -32,7 +32,7 @@ public class CsvToXml
 			
 			//While file is not finished
 			while(fileReader.hasNextLine()) {
-				records.add(getRecordFromLine(fileReader.nextLine()));
+				records.add(getCSVRecordFromLine(fileReader.nextLine()));
 				
 			}
 			//Close input file reader, XML parsed
@@ -63,13 +63,13 @@ public class CsvToXml
 			for(int i = 0; i < records.size() - 1; i++) 
 			{
 				//Manually 
-				bufferedOutput.write("<row>\n");
+				bufferedOutput.write("  <row>\n");
 				
 				for(int j = 0; j < records.get(i).size(); j++) 
 				{
 					
 					//Grab the column header start for this element
-					bufferedOutput.write("<" + records.get(0).get(j) + ">");
+					bufferedOutput.write("\t<" + records.get(0).get(j) + ">");
 					
 					//Add the corresponding element
 					bufferedOutput.write(records.get(i + 1).get(j));
@@ -80,7 +80,7 @@ public class CsvToXml
 				}
 				
 				//Format for end of row entry
-				bufferedOutput.write("</row>\n");
+				bufferedOutput.write("  </row>\n");
 					
 			}
 			
@@ -103,8 +103,10 @@ public class CsvToXml
 		//System.out.println(records.size());
 		
 	}
-	
-	private static List<String> getRecordFromLine(String line)
+	/*	Takes a string input (from a CSV) and returns a list of strings
+		which contain the fields of the CSV
+	 */
+	private static List<String> getCSVRecordFromLine(String line)
 	{
 		//Create new List<String> to return
 		List<String> values = new ArrayList<String>();
